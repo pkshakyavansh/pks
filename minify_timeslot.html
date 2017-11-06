@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+<style>
+.customtmpicker{max-width: 280px; background-color: #fff; border:2px solid #1bb394; max-height: 200px;  position: absolute; left: 0; top: 33px;}
+.customtmpicker ul.ctpicker{ list-style: none; margin:0; padding: 0; max-height: 130px; overflow-y: scroll; overflow-x: hidden; padding: 3px}
+.customtmpicker ul.ctpicker li{display: inline-block; min-width: 57px; border:1px solid transparent; padding: 5px 0; margin:2px; font-size: 12px; float: left; text-align: center; border-radius: 2px; cursor: pointer;}
+.customtmpicker .slotstatus{ float: left;; width: 100%; height: 30px; border-top:1px solid #1bb394;}
+.customtmpicker .slotstatus span{ display: inline-block;
+    font-size: 14px;
+    margin-left: 10px;
+    margin-top: 6px;}
+ .slotstatus span i{display: inline-block; width: 10px; height: 10px; margin-right: 5px;}
+ .slotstatus span.avilabledot i{background-color: #1bb394}
+ .slotstatus span.bookeddot i{background-color: #ff8b00}
+ .customtmpicker ul.ctpicker li.tpitem{color:#1bb394; border-color:#1bb394!important}
+ .customtmpicker ul.ctpicker li.disabled{color:#333; border-color:#333!important; background-color: #ddd;cursor:default!important;}
+ .customtmpicker ul.ctpicker li.booked{border-color:#ff8b00; background-color:#ff8b00; color: #fff; cursor:default!important;}
+  .customtmpicker ul.ctpicker li.selected{border-color:#22a5ff; background-color:#22a5ff; color: #fff}
+  .ctimslotoutr{width: 300px; display: inline-block; position: relative;}
+  .ctimslotoutr .ctimslot{width: 100%; display: inline-block; height: 30px}
+</style>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script>
+$(document).ready(function() {
+    $(".ctpicker").on("click", "li", function() {
+        var itmclass = $(this).attr('class');
+        switch (itmclass) {
+            case 'tpitem':
+                $(this).prevAll("li.booked").prevAll().not('li.booked').addClass('disabled').removeClass('tpitem');
+                $(this).nextUntil('.booked').addBack().nextAll('.tpitem').not('.booked').addClass('disabled').removeClass('tpitem');
+                $(this).nextUntil('.booked').addClass('tpitem').removeClass('disabled');
+                setInterval(function() {
+                    if ($("ul.ctpicker li").hasClass('selected tpitem')) {
+                        $('ul.ctpicker li.selected.tpitem').removeClass('selected tpitem').addClass('selected');
+                    }
+                }, 1);
+                $(this).addClass("selected").removeClass("tpitem");
+                getselected();
+                break;
+            case 'selected':
+                if ($('ul.ctpicker li.selected').length == 1) {
+                    $('ul.ctpicker li.disabled').addClass('tpitem').removeClass('disabled');
+                }
+                $(this).addClass("tpitem").removeClass("selected");
+                getselected();
+                break;
+        }
+    });
+    var clickcount = [];
+    $('ul.ctpicker li').each(function(elem) {
+        $(this).click(function(e) {
+            if ($(this).hasClass('tpitem')) {
+                clickcount.push($(this).index());
+                if (clickcount.length == 2) {
+                    var nidex = clickcount.sort(function(a, b) {
+                        return a - b
+                    });
+                    var fidx = nidex[0];
+                    var lidx = nidex[nidex.length - 1];
+
+                    $("ul.ctpicker li").slice(fidx, lidx).addClass('selected').removeClass('tpitem');
+                    $('.customtmpicker').hide();
+                    clickcount = [];
+                }
+                if (clickcount.length > 2) {
+                    return false
+                }
+            }
+        });
+    });
+
+});
+
+function getselected() {
+    var selectslots = [];
+
+    $('ul.ctpicker li.selected').each(function() {
+        var slots = '';
+        slots += $(this).text();
+        selectslots.push(slots);
+
+    });
+    //alert(selectslots.length);
+    if (selectslots.length == 0) {
+        //return false
+        $('.ctimslot').val("");
+    } else {
+        if (selectslots.length == 1) {
+            $('.ctimslot').val(selectslots);
+        } else {
+            var rangeval = selectslots[0] + " - " + selectslots.pop();
+            $('.ctimslot').val(rangeval);
+        }
+    }
+}
+
+$(function() {
+    $('.ctimslot').click(function() {
+        $('.ctpicker li').each(function() {
+            $(".ctpicker li.selected").addClass('tpitem').removeClass('selected');
+            $(".ctpicker li.disabled").addClass('tpitem').removeClass('disabled');
+        });
+        $(this).next('.customtmpicker').slideDown('fast');
+    })
+})
+</script>
+</head>
+<body>
+	<h2>selected slot bind Directly</h2>  
+  <h3>selected slots here</h3>
+<p></p>
+<div class="ctimslotoutr">
+<input type="text" name="" class="ctimslot">
+<div class="customtmpicker" style="display:none">
+<ul class="ctpicker">
+<li class="tpitem">12:00am</li><li class="tpitem">12:30am</li><li class="tpitem">1:00am</li><li class="booked">1:30am</li><li class="tpitem">2:00am</li><li class="tpitem">2:30am</li><li class="tpitem">3:00am</li><li class="tpitem">3:30am</li><li class="tpitem">4:00am</li><li class="tpitem">4:30am</li><li class="tpitem">5:00am</li><li class="tpitem">5:30am</li><li class="tpitem">6:00am</li><li class="tpitem">6:30am</li><li class="tpitem">7:00am</li><li class="tpitem">7:30am</li><li class="tpitem">8:00am</li><li class="tpitem">8:30am</li><li class="tpitem">9:00am</li><li class="tpitem">9:30am</li><li class="tpitem">10:00am</li><li class="tpitem">10:30am</li><li class="booked">11:00am</li><li class="tpitem">11:30am</li><li class="tpitem">12:00pm</li><li class="tpitem">12:30pm</li><li class="tpitem">1:00pm</li><li class="tpitem">1:30pm</li><li class="tpitem">2:00pm</li><li class="tpitem">2:30pm</li><li class="tpitem">3:00pm</li><li class="tpitem">3:30pm</li><li class="tpitem">4:00pm</li><li class="tpitem">4:30pm</li><li class="tpitem">5:00pm</li><li class="tpitem">5:30pm</li><li class="tpitem">6:00pm</li><li class="tpitem">6:30pm</li><li class="tpitem">7:00pm</li><li class="tpitem">7:30pm</li><li class="tpitem">8:00pm</li><li class="tpitem">8:30pm</li><li class="tpitem">9:00pm</li><li class="tpitem">9:30pm</li><li class="tpitem">10:00pm</li><li class="tpitem">10:30pm</li><li class="tpitem">11:00pm</li><li class="tpitem">11:30pm</li></ul>
+<div class="slotstatus">
+<span class="avilabledot"><i></i> Available slots</span>
+<span class="bookeddot"><i></i>Booked Slots</span>
+</div>
+</div>
+</div>
+</body>
+</html>
